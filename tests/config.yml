@@ -1,0 +1,4 @@
+commands:
+  fake: fakecmd
+
+notreal: not a real value
