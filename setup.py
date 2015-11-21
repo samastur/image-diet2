@@ -13,7 +13,7 @@ setup(
     author="Marko Samastur",
     author_email="markos@gaivo.net",
     name='image-diet2',
-    version='0.7.1',
+    version='0.8',
     description='Remove unnecessary bytes from images',
     long_description=long_description,
     url='https://github.com/samastur/image-diet2/',

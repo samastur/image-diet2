@@ -1,5 +1,7 @@
 import importlib
-from os.path import abspath, basename, dirname, join
+from io import BytesIO
+import os
+from os.path import abspath, basename, dirname, join, exists
 import shutil
 
 from django.conf import settings
@@ -43,14 +45,29 @@ class DietMixin(object):
         shutil.copyfile(fullname, path)
         return path
 
-'''
-    def save(self, name, content):
+    def save_to_temp(self, fullname, content):
+        name = basename(fullname)
+        path = join(self.temp_dir, name)
+        with open(path, 'wb') as f:
+            f.write(content)
+        return path
+
+    def _save(self, name, content):
         file_content = content.read()
-        if self.exists(name):
-            self.delete(name)
-        f = File(StringIO(file_content))
-        return super(DietMixin, self).save(name, File(f))
-'''
+        tmppath = ""
+
+        try:
+            tmppath = self.save_to_temp(name, file_content)
+            changed = diet.diet(tmppath, self.config)
+            if changed:
+                with open(tmppath, 'rb') as f:
+                    file_content = f.read() # pragma: no branch
+
+            f = File(BytesIO(file_content))
+        finally:
+            # Always clean up after ourselves
+            os.remove(tmppath)
+        return super(DietMixin, self)._save(name, File(f))
 
 
 class DietStorage(DietMixin, STORAGE_CLASS):
