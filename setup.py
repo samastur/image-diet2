@@ -29,7 +29,7 @@ setup(
         'Topic :: Utilities',
     ],
     install_requires=[
-        'pyimagediet>=0.5',
+        'pyimagediet>=0.9',
     ],
     include_package_data=True,
     packages=['image_diet'],
