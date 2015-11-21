@@ -1,9 +1,10 @@
 import importlib
-from os.path import abspath, dirname, join
+from os.path import abspath, basename, dirname, join
+import shutil
 
 from django.conf import settings
 from django.core.files.base import File
-import pyimagediet.diet as diet
+import pyimagediet as diet
 
 
 THIS_DIR = abspath(dirname(__file__))
@@ -18,24 +19,29 @@ STORAGE_CLASS = getattr(storage_module, STORAGE_CLASSNAME)
 CUSTOM_CONFIG = getattr(settings, 'DIET_CONFIG', '')
 
 
-def update_config(orig, new):
-    dicts = ('commands', 'parameters', 'pipelines')
-    for key in dicts:
-        if key in new:
-            orig[key].update(new[key])
-
-    for key in new:
-        if key not in dicts:
-            orig[key] = new[key]
-
-
 class DietMixin(object):
     def __init__(self, *args, **kwargs):
         default_config = join(THIS_DIR, 'default.yml')
 
         config = diet.read_yaml_configuration(default_config)
-        update_config(config, diet.read_yaml_configuration(CUSTOM_CONFIG))
+        diet.update_configuration(config,
+                                  diet.read_yaml_configuration(CUSTOM_CONFIG))
         self.config = config
+        self.temp_dir = self.config.get('tempdir', '/tmp')
+
+
+    def copy_to_temp(self, fullname):
+        '''Copy file to the configured temporary directory.
+
+        We can't rely on file's current path to point to directory where
+        intermediate files can be created because it might not point to a
+        filesystem at all. External tools however are filesystem based so we
+        need to process file somewhere safe (configured directory).
+        '''
+        name = basename(fullname)
+        path = join(self.temp_dir, name)
+        shutil.copyfile(fullname, path)
+        return path
 
 '''
     def save(self, name, content):
@@ -44,8 +50,8 @@ class DietMixin(object):
             self.delete(name)
         f = File(StringIO(file_content))
         return super(DietMixin, self).save(name, File(f))
+'''
 
 
 class DietStorage(DietMixin, STORAGE_CLASS):
     pass
-'''
