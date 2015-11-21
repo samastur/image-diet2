@@ -32,19 +32,6 @@ class DietMixin(object):
         self.temp_dir = self.config.get('tempdir', '/tmp')
 
 
-    def copy_to_temp(self, fullname):
-        '''Copy file to the configured temporary directory.
-
-        We can't rely on file's current path to point to directory where
-        intermediate files can be created because it might not point to a
-        filesystem at all. External tools however are filesystem based so we
-        need to process file somewhere safe (configured directory).
-        '''
-        name = basename(fullname)
-        path = join(self.temp_dir, name)
-        shutil.copyfile(fullname, path)
-        return path
-
     def save_to_temp(self, fullname, content):
         name = basename(fullname)
         path = join(self.temp_dir, name)
@@ -59,7 +46,8 @@ class DietMixin(object):
         try:
             tmppath = self.save_to_temp(name, file_content)
             changed = diet.diet(tmppath, self.config)
-            if changed:
+            if changed:  # pragma: no branch
+                # If changed, then tmppath points to compressed contents.
                 with open(tmppath, 'rb') as f:
                     file_content = f.read() # pragma: no branch
 

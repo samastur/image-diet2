@@ -36,25 +36,6 @@ def create_file(filename, content):
     return path
 
 
-def test_copy_to_temp_makes_a_copy_in_temp_directory():
-    mixin = storage.DietMixin()
-
-    filename = 'tempfile.txt'
-    content = "This file is empty."
-    path = create_file(filename, content)
-
-
-    tmppath = join(mixin.temp_dir, filename)
-    assert not exists(tmppath)
-
-    assert mixin.copy_to_temp(path) == tmppath
-    assert exists(tmppath)
-    assert filecmp.cmp(path, tmppath)
-
-    os.remove(path)
-    os.remove(tmppath)
-
-
 def test_save_to_temp_copies_content_to_same_named_file_in_temp_directory():
     mixin = storage.DietMixin()
 
