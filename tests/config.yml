@@ -3,5 +3,7 @@ commands:
 
 pipelines:
   jpeg: []
+  png:
+    - optipng
 
 notreal: not a real value

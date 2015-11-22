@@ -29,68 +29,106 @@ def test_mixin_also_reads_custom_configuration():
     assert mixin.config['notreal'] == 'not a real value'
 
 
-def create_file(filename, content):
-    path = join(THIS_DIR, filename)
-    with open(path, 'w') as f:
-        f.write(content)
-    return path
-
-
 def test_save_to_temp_copies_content_to_same_named_file_in_temp_directory():
     mixin = storage.DietMixin()
 
-    filename = 'tempfile.txt'
-    content = "This file is empty."
-    path = create_file(filename, content)
+    filename = 'stockholm.jpg'
+    path = join(THIS_DIR, 'test_files', 'stockholm.jpg')
+    with open(path, 'rb') as f:
+        content = f.read()
 
     tmppath = join(mixin.temp_dir, filename)
-    assert not exists(tmppath)
 
-    assert mixin.save_to_temp(path, content) == tmppath
-    assert exists(tmppath)
-    assert filecmp.cmp(path, tmppath)
+    try:
+        assert not exists(tmppath)
+        assert mixin.save_to_temp(path, content) == tmppath
+        assert exists(tmppath)
+        assert filecmp.cmp(path, tmppath)
 
-    os.remove(path)
-    os.remove(tmppath)
+    finally:
+        os.remove(tmppath)
 
 
-def test_save_method_saves_file():
+def test_save_method_saves_text_file():
     dietstorage = storage.DietStorage()
+    # Filesystem storage parameters
+    dietstorage.location = THIS_DIR
+    dietstorage.file_permissions_mode = 0o644
 
     filename = 'tempfile.txt'
     content = "This file is empty."
     path = join(THIS_DIR, filename)
 
-    # Filesystem storage parameters
-    dietstorage.location = THIS_DIR
-    dietstorage.file_permissions_mode = 0o644
+    tmppath = join(dietstorage.temp_dir, filename)
+    tmppath = dietstorage.save_to_temp(path, content)
+
+    new_path = dietstorage._save(path, open(tmppath, 'r'))
+
+    try:
+        assert exists(new_path)
+        assert open(new_path, 'r').read() == content
+        assert not exists(tmppath)
+    finally:
+        os.remove(new_path)
+
+
+def test_save_method_saves_binary_file():
+    dietstorage = storage.DietStorage()
+
+    filename = 'stockholm.jpg'
+    path = join(THIS_DIR, 'test_files', 'stockholm.jpg')
+    with open(path, 'rb') as f:
+        content = f.read()
 
     tmppath = join(dietstorage.temp_dir, filename)
     tmppath = dietstorage.save_to_temp(path, content)
 
     new_path = dietstorage._save(path, open(tmppath, 'rb'))
 
-    assert exists(new_path)
-    assert open(new_path, 'r').read() == content
-    assert not exists(tmppath)
-    os.remove(new_path)
+    try:
+        assert exists(new_path)
+        assert open(new_path, 'rb').read() == content
+        assert not exists(tmppath)
+    finally:
+        os.remove(new_path)
 
+
+def test_save_method_compresses():
+    dietstorage = storage.DietStorage()
+
+    filename = 'png_test.png'
+    path = join(THIS_DIR, 'test_files', 'png_test.png')
+    with open(path, 'rb') as f:
+        content = f.read()
+
+    tmppath = join(dietstorage.temp_dir, filename)
+    tmppath = dietstorage.save_to_temp(path, content)
+
+    new_path = dietstorage._save(path, open(tmppath, 'rb'))
+
+    try:
+        assert exists(new_path)
+        assert len(open(new_path, 'rb').read()) < len(content)
+        assert not exists(tmppath)
+    finally:
+        os.remove(new_path)
 
 
 def test_save_method_cleans_temp_directory():
     dietstorage = storage.DietStorage()
-
-    filename = 'tempfile.txt'
-    content = "This file is empty."
-    path = create_file(filename, content)
-
     # Filesystem storage parameters
     dietstorage.location = THIS_DIR
     dietstorage.file_permissions_mode = 0o644
 
+    filename = 'stockholm.jpg'
+    path = join(THIS_DIR, 'test_files', 'stockholm.jpg')
+    with open(path, 'rb') as f:
+        content = f.read()
+
     tmppath = join(dietstorage.temp_dir, filename)
     new_path = dietstorage._save(path, open(path, 'rb'))
 
-    assert not exists(tmppath)
-    os.remove(path)
-    os.remove(new_path)
+    try:
+        assert not exists(tmppath)
+    finally:
+        os.remove(new_path)

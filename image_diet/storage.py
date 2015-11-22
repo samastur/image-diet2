@@ -1,8 +1,7 @@
 import importlib
-from io import BytesIO
+from io import BytesIO, StringIO
 import os
-from os.path import abspath, basename, dirname, join, exists
-import shutil
+from os.path import abspath, basename, dirname, join
 
 from django.conf import settings
 from django.core.files.base import File
@@ -36,7 +35,8 @@ class DietMixin(object):
     def save_to_temp(self, fullname, content):
         name = basename(fullname)
         path = join(self.temp_dir, name)
-        with open(path, 'wb') as f:
+        mode = 'wb' if type(content) == bytes else 'wt'
+        with open(path, mode) as f:
             f.write(content)
         return path
 
@@ -50,9 +50,12 @@ class DietMixin(object):
             if changed:  # pragma: no branch
                 # If changed, then tmppath points to compressed contents.
                 with open(tmppath, 'rb') as f:
-                    file_content = f.read() # pragma: no branch
+                    file_content = f.read()  # pragma: no branch
 
             f = File(BytesIO(file_content))
+        # TypeError is for catching different handling of text in Python3
+        except TypeError:  # pragma: no branch
+            f = File(StringIO(file_content))
         finally:
             # Always clean up after ourselves
             os.remove(tmppath)
