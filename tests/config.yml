@@ -1,4 +1,7 @@
 commands:
   fake: fakecmd
 
+pipelines:
+  jpeg: []
+
 notreal: not a real value
