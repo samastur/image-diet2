@@ -30,6 +30,7 @@ class DietMixin(object):
                                   diet.read_yaml_configuration(CUSTOM_CONFIG))
         self.config = config
         self.temp_dir = self.config.get('tempdir', '/tmp')
+        super(DietMixin, self).__init__(*args, **kwargs)
 
 
     def save_to_temp(self, fullname, content):
