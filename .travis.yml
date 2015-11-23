@@ -17,6 +17,7 @@ matrix:
 # command to install dependencies
 install: 
   - sudo apt-get install optipng
+  - pip install Django==1.7.10   # 1.8+ don't work with Python2.6
   - pip install coveralls
   - pip install tox
 # command to run tests
