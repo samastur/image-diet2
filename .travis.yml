@@ -1,8 +1,6 @@
 language: python
 matrix:
   include:
-    - python: "2.6"
-      env: TOXENV=py26 DIET_TOOLS_DIR=/usr/bin
     - python: "2.7"
       env: TOXENV=py27 DIET_TOOLS_DIR=/usr/bin
     - python: "3.3"
@@ -17,7 +15,6 @@ matrix:
 # command to install dependencies
 install: 
   - sudo apt-get install optipng
-  - pip install Django==1.7.10   # 1.8+ don't work with Python2.6
   - pip install coveralls
   - pip install tox
 # command to run tests
