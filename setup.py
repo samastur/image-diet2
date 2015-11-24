@@ -52,7 +52,8 @@ setup(
         'Topic :: Utilities',
     ],
     install_requires=[
-        'Django>=1.7',
+        'Django>=1.6',
+        'importlib~=1.0.3',
         'pyimagediet>=0.9',
     ],
     include_package_data=True,

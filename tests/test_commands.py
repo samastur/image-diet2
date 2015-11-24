@@ -46,7 +46,7 @@ commands:
 def test_handles_output():
     expected = """\
 commands:
-  optipng: {}/optipng
+  optipng: {0}/optipng
 
 """.format(TOOLS_DIR)
 
