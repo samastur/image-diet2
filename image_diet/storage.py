@@ -31,7 +31,6 @@ class DietMixin(object):
         self.temp_dir = self.config.get('tempdir', '/tmp')
         super(DietMixin, self).__init__(*args, **kwargs)
 
-
     def save_to_temp(self, fullname, content):
         name = basename(fullname)
         path = join(self.temp_dir, name)
