@@ -24,5 +24,5 @@ Contents:
    :maxdepth: 2
 
    install
-   configure
+   quickstart
    license
