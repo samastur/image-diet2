@@ -25,4 +25,5 @@ Contents:
 
    install
    quickstart
+   commands
    license
