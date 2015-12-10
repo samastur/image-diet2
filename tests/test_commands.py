@@ -24,12 +24,28 @@ def test_find_tools_finds_them():
     assert cmds['optipng'] == path
 
 
-def test_cmds_to_yaml_returns_empty_string_when_given_no_commands():
-    output = command.Command.cmds_to_yaml({})
+def test_cmds_to_pipelines_returns_correct_dict_when_tools_present():
+    commands = {
+        'optipng': 'optipng',
+        'pngcrush': 'pngcrush',
+        'gifsicle': 'gifsicle',
+        'jpegoptim': 'jpegoptim',
+    }
+    expected = {
+        'png': ['optipng', 'pngcrush'],
+        'gif': ['gifsicle'],
+        'jpeg': ['jpegoptim']
+    }
+    output = command.Command.cmds_to_pipelines(commands)
+    assert output == expected
+
+
+def test_section_to_yaml_returns_empty_string_when_given_no_commands():
+    output = command.Command.section_to_yaml('commands', {})
     assert output == ""
 
 
-def test_cmds_to_yaml_returns_correct_yaml_when_tools_present():
+def test_section_to_yaml_returns_correct_yaml_when_tools_present():
     tools = {
         'advpng': '/bin/advpng',
         'optipng': '/bin/optipng',
@@ -39,7 +55,7 @@ commands:
   advpng: /bin/advpng
   optipng: /bin/optipng
 """
-    output = command.Command.cmds_to_yaml(tools)
+    output = command.Command.section_to_yaml('commands', tools)
     assert output == expected
 
 
@@ -47,6 +63,9 @@ def test_handles_output():
     expected = """\
 commands:
   optipng: {0}/optipng
+pipelines:
+  png:
+  - optipng
 
 """.format(TOOLS_DIR)
 
