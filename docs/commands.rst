@@ -12,3 +12,10 @@ check_diet_tools
 
 This command will check system for most common compression tools and print
 paths of those found in format ready for inclusion in YAML configuration file.
+
+
+diet_images
+-----------
+
+This command will traverse provided list of directories and compress all files
+with matching pipeline according to image-diet2's configuration.

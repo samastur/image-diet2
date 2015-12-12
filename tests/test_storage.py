@@ -1,6 +1,6 @@
 import filecmp
 import os
-from os.path import abspath, basename, dirname, join, exists
+from os.path import abspath, dirname, join, exists
 from image_diet import storage
 
 
@@ -11,6 +11,13 @@ def test_the_right_storage_has_been_imported():
     from django.core import files
 
     assert files.storage.FileSystemStorage == storage.STORAGE_CLASS
+
+
+def test_get_configuration_returns_parsed_configuration():
+    config = storage.get_configuration()
+
+    assert config['commands']['fake'] == 'fakecmd'
+    assert config['commands']['advpng'] == 'advpng'
 
 
 def test_mixin_reads_default_configuration():

@@ -20,14 +20,18 @@ STORAGE_CLASS = getattr(storage_module, STORAGE_CLASSNAME)
 CUSTOM_CONFIG = getattr(settings, 'DIET_CONFIG', '')
 
 
+def get_configuration():
+    default_config = join(THIS_DIR, 'default.yml')
+
+    config = diet.read_yaml_configuration(default_config)
+    diet.update_configuration(config,
+                              diet.read_yaml_configuration(CUSTOM_CONFIG))
+    return config
+
+
 class DietMixin(object):
     def __init__(self, *args, **kwargs):
-        default_config = join(THIS_DIR, 'default.yml')
-
-        config = diet.read_yaml_configuration(default_config)
-        diet.update_configuration(config,
-                                  diet.read_yaml_configuration(CUSTOM_CONFIG))
-        self.config = config
+        self.config = get_configuration()
         self.temp_dir = self.config.get('tempdir', '/tmp')
         super(DietMixin, self).__init__(*args, **kwargs)
 
