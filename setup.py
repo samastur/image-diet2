@@ -21,14 +21,12 @@ def find_version(*file_paths):
     raise RuntimeError("Unable to find version string.")
 
 
-long_description = '''\
-image-diet2 is a Django application for removing unnecessary bytes from image
-files.  It optimizes images without changing their look or visual quality
-("losslessly").
+def read_long_description():
+    long_description = ""
+    with open('README.rst', 'r') as f:
+        long_description = f.read()
+    return long_description
 
-It works on images in JPEG, GIF, PNG or any format with configured a
-processing pipeline. Integration with Django's storage system provides a
-seamless integration with most thumbnailing apps.'''
 
 setup(
     author="Marko Samastur",
@@ -36,7 +34,7 @@ setup(
     name='image-diet2',
     version=find_version('image_diet', '__init__.py'),
     description='Remove unnecessary bytes from images',
-    long_description=long_description,
+    long_description=read_long_description(),
     url='https://github.com/samastur/image-diet2/',
     platforms=['OS Independent'],
     license='MIT License',
