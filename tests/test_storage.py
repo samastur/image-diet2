@@ -1,10 +1,21 @@
 import filecmp
 import os
 from os.path import abspath, dirname, join, exists
+import pytest
+
 from image_diet import storage
 
 
 THIS_DIR = abspath(dirname(__file__))
+
+
+@pytest.fixture
+def dietstorage():
+    dietstorage = storage.DietStorage()
+    # Filesystem storage parameters
+    dietstorage.location = THIS_DIR
+    dietstorage.file_permissions_mode = 0o644
+    return dietstorage
 
 
 def test_the_right_storage_has_been_imported():
@@ -56,12 +67,7 @@ def test_save_to_temp_copies_content_to_same_named_file_in_temp_directory():
         os.remove(tmppath)
 
 
-def test_save_method_saves_text_file():
-    dietstorage = storage.DietStorage()
-    # Filesystem storage parameters
-    dietstorage.location = THIS_DIR
-    dietstorage.file_permissions_mode = 0o644
-
+def test_save_method_saves_text_file(dietstorage):
     filename = 'tempfile.txt'
     content = "This file is empty."
     path = join(THIS_DIR, filename)
@@ -79,9 +85,7 @@ def test_save_method_saves_text_file():
         os.remove(new_path)
 
 
-def test_save_method_saves_binary_file():
-    dietstorage = storage.DietStorage()
-
+def test_save_method_saves_binary_file(dietstorage):
     filename = 'stockholm.jpg'
     path = join(THIS_DIR, 'test_files', 'stockholm.jpg')
     with open(path, 'rb') as f:
@@ -100,9 +104,7 @@ def test_save_method_saves_binary_file():
         os.remove(new_path)
 
 
-def test_save_method_compresses():
-    dietstorage = storage.DietStorage()
-
+def test_save_method_compresses(dietstorage):
     filename = 'png_test.png'
     path = join(THIS_DIR, 'test_files', 'png_test.png')
     with open(path, 'rb') as f:
@@ -121,16 +123,31 @@ def test_save_method_compresses():
         os.remove(new_path)
 
 
-def test_save_method_cleans_temp_directory():
-    dietstorage = storage.DietStorage()
-    # Filesystem storage parameters
-    dietstorage.location = THIS_DIR
-    dietstorage.file_permissions_mode = 0o644
+def test_logger_logs_errors(caplog, dietstorage):
+    # Delete configuration section so that DietException will be raised
+    del dietstorage.config['commands']
 
     filename = 'stockholm.jpg'
     path = join(THIS_DIR, 'test_files', 'stockholm.jpg')
-    with open(path, 'rb') as f:
-        content = f.read()
+
+    tmppath = join(dietstorage.temp_dir, filename)
+
+    try:
+        dietstorage._save(path, open(path, 'rb'))
+    except storage.diet.DietException as e:
+        assert not exists(tmppath)
+        assert isinstance(e, storage.diet.ConfigurationErrorDietException)
+
+    records = list(caplog.records())
+    assert len(records) == 1
+    record = records[0]
+    assert record.levelname == 'ERROR'
+    assert record.message == 'Missing key(s) in configuration: gifsicle.'
+
+
+def test_save_method_cleans_temp_directory(dietstorage):
+    filename = 'stockholm.jpg'
+    path = join(THIS_DIR, 'test_files', 'stockholm.jpg')
 
     tmppath = join(dietstorage.temp_dir, filename)
     new_path = dietstorage._save(path, open(path, 'rb'))

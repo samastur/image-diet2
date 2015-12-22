@@ -9,8 +9,9 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 '''Next two functions borrowed from pip's setup.py'''
 def read(*parts):
     # intentionally *not* adding an encoding option to open
-    # see here: https://github.com/pypa/virtualenv/issues/201#issuecomment-3145690
+    # see: https://github.com/pypa/virtualenv/issues/201#issuecomment-3145690
     return codecs.open(os.path.join(HERE, *parts), 'r').read()
+
 
 def find_version(*file_paths):
     version_file = read(*file_paths)
@@ -59,7 +60,7 @@ setup(
     ],
     install_requires=[
         'Django>=1.7',
-        'pyimagediet>=0.9.2',
+        'pyimagediet>=1.0.2',
     ],
     include_package_data=True,
     packages=['image_diet'],

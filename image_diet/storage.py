@@ -1,5 +1,6 @@
 import importlib
 from io import BytesIO, StringIO
+import logging
 import os
 from os.path import abspath, basename, dirname, join
 
@@ -7,6 +8,8 @@ from django.conf import settings
 from django.core.files.base import File
 import pyimagediet as diet
 
+
+logger = logging.getLogger('image_diet')
 
 THIS_DIR = abspath(dirname(__file__))
 
@@ -59,6 +62,9 @@ class DietMixin(object):
         # TypeError is for catching different handling of text in Python3
         except TypeError:  # pragma: no branch
             f = File(StringIO(file_content))
+        except (diet.DietException) as e:
+            logger.error(e.msg)
+            raise
         finally:
             # Always clean up after ourselves
             os.remove(tmppath)
