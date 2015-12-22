@@ -142,7 +142,7 @@ def test_logger_logs_errors(caplog, dietstorage):
     assert len(records) == 1
     record = records[0]
     assert record.levelname == 'ERROR'
-    assert record.message == 'Missing key(s) in configuration: gifsicle.'
+    assert record.message.startswith('Missing key(s) in configuration: ')
 
 
 def test_save_method_cleans_temp_directory(dietstorage):
