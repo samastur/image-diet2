@@ -58,7 +58,7 @@ def test_save_to_temp_copies_content_to_same_named_file_in_temp_directory():
     tmppath = join(mixin.temp_dir, filename)
 
     try:
-        assert not exists(tmppath)
+        assert exists(tmppath) is False
         assert mixin.save_to_temp(path, content) == tmppath
         assert exists(tmppath)
         assert filecmp.cmp(path, tmppath)
@@ -72,10 +72,9 @@ def test_save_method_saves_text_file(dietstorage):
     content = "This file is empty."
     path = join(THIS_DIR, filename)
 
-    tmppath = join(dietstorage.temp_dir, filename)
     tmppath = dietstorage.save_to_temp(path, content)
 
-    new_path = dietstorage._save(path, open(tmppath, 'r'))
+    new_path = dietstorage.save(path, open(tmppath, 'r'))
 
     try:
         assert exists(new_path)
@@ -86,12 +85,10 @@ def test_save_method_saves_text_file(dietstorage):
 
 
 def test_save_method_saves_binary_file(dietstorage):
-    filename = 'stockholm.jpg'
     path = join(THIS_DIR, 'test_files', 'stockholm.jpg')
     with open(path, 'rb') as f:
         content = f.read()
 
-    tmppath = join(dietstorage.temp_dir, filename)
     tmppath = dietstorage.save_to_temp(path, content)
 
     new_path = dietstorage._save(path, open(tmppath, 'rb'))
@@ -105,12 +102,10 @@ def test_save_method_saves_binary_file(dietstorage):
 
 
 def test_save_method_compresses(dietstorage):
-    filename = 'png_test.png'
     path = join(THIS_DIR, 'test_files', 'png_test.png')
     with open(path, 'rb') as f:
         content = f.read()
 
-    tmppath = join(dietstorage.temp_dir, filename)
     tmppath = dietstorage.save_to_temp(path, content)
 
     new_path = dietstorage._save(path, open(tmppath, 'rb'))
@@ -133,7 +128,7 @@ def test_logger_logs_errors(caplog, dietstorage):
     tmppath = join(dietstorage.temp_dir, filename)
 
     try:
-        dietstorage._save(path, open(path, 'rb'))
+        dietstorage.save(path, open(path, 'rb'))
     except storage.diet.DietException as e:
         assert not exists(tmppath)
         assert isinstance(e, storage.diet.ConfigurationErrorDietException)
@@ -150,7 +145,7 @@ def test_save_method_cleans_temp_directory(dietstorage):
     path = join(THIS_DIR, 'test_files', 'stockholm.jpg')
 
     tmppath = join(dietstorage.temp_dir, filename)
-    new_path = dietstorage._save(path, open(path, 'rb'))
+    new_path = dietstorage.save(path, open(path, 'rb'))
 
     try:
         assert not exists(tmppath)

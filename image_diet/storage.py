@@ -49,6 +49,7 @@ class DietMixin(object):
     def _save(self, name, content):
         file_content = content.read()
         tmppath = ""
+        f = None
 
         try:
             tmppath = self.save_to_temp(name, file_content)
@@ -66,6 +67,9 @@ class DietMixin(object):
             logger.error(e.msg)
             raise
         finally:
+            if not f:
+                f = File(BytesIO(file_content))
+
             # Always clean up after ourselves
             os.remove(tmppath)
         return super(DietMixin, self)._save(name, File(f))
