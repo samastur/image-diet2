@@ -84,14 +84,27 @@ def test_save_method_saves_text_file(dietstorage):
         os.remove(new_path)
 
 
-def test_save_method_saves_binary_file(dietstorage):
-    path = join(THIS_DIR, 'test_files', 'stockholm.jpg')
+def prepare_test_files(filename):
+    copy_filename = 'copy_' + filename
+    tmppath = join('/tmp', filename)
+    copypath = join('/tmp', copy_filename)
+
+    path = join(THIS_DIR, 'test_files', filename)
     with open(path, 'rb') as f:
         content = f.read()
 
-    tmppath = dietstorage.save_to_temp(path, content)
+    with open(copypath, 'wb') as f:
+        f.write(content)
 
-    new_path = dietstorage._save(path, open(tmppath, 'rb'))
+    # Original test_file , working copy (can be changed), internal copy if it
+    # exists and content of original file
+    return (path, copypath, tmppath, content)
+
+
+def test_save_method_saves_binary_file(dietstorage):
+    path, copypath, tmppath, content = prepare_test_files('stockholm.jpg')
+
+    new_path = dietstorage.save(path, open(copypath, 'rb'))
 
     try:
         assert exists(new_path)
@@ -99,16 +112,13 @@ def test_save_method_saves_binary_file(dietstorage):
         assert not exists(tmppath)
     finally:
         os.remove(new_path)
+        os.remove(copypath)
 
 
 def test_save_method_compresses(dietstorage):
-    path = join(THIS_DIR, 'test_files', 'png_test.png')
-    with open(path, 'rb') as f:
-        content = f.read()
+    path, copypath, tmppath, content = prepare_test_files('png_test.png')
 
-    tmppath = dietstorage.save_to_temp(path, content)
-
-    new_path = dietstorage._save(path, open(tmppath, 'rb'))
+    new_path = dietstorage.save(path, open(copypath, 'rb'))
 
     try:
         assert exists(new_path)
@@ -116,6 +126,7 @@ def test_save_method_compresses(dietstorage):
         assert not exists(tmppath)
     finally:
         os.remove(new_path)
+        os.remove(copypath)
 
 
 def test_logger_logs_errors(caplog, dietstorage):

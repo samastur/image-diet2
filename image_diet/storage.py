@@ -58,20 +58,18 @@ class DietMixin(object):
                 # If changed, then tmppath points to compressed contents.
                 with open(tmppath, 'rb') as f:
                     file_content = f.read()  # pragma: no branch
-
-            f = File(BytesIO(file_content))
-        # TypeError is for catching different handling of text in Python3
-        except TypeError:  # pragma: no branch
-            f = File(StringIO(file_content))
         except (diet.DietException) as e:
             logger.error(e.msg)
             raise
         finally:
-            if not f:
-                f = File(BytesIO(file_content))
-
             # Always clean up after ourselves
             os.remove(tmppath)
+
+        try:
+            f = File(BytesIO(file_content))
+        # TypeError is for catching different handling of text in Python3
+        except TypeError:  # pragma: no branch
+            f = File(StringIO(file_content))
         return super(DietMixin, self)._save(name, File(f))
 
 
