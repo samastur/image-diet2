@@ -24,15 +24,7 @@ parameters:
 
 # Pipelines for each file type. Order of labels specifies order of execution
 # Use same labels as in command section.
-pipelines:
-  png:
-    - optipng
-    - advpng
-    - pngcrush
-  gif:
-    - gifsicle
-  jpeg:
-    - jpegtran
+pipelines: {}
 
 # Uncomment and set if you want to backup original image
 # backup: orig
