@@ -61,6 +61,10 @@ class DietMixin(object):
         except (diet.DietException) as e:
             logger.error(e.msg)
             raise
+        except (OSError, IOError) as e:
+            msg = 'Cannot save to temp dir ({0})'.format(str(e))
+            logger.error(msg)
+            raise
         finally:
             # Always clean up after ourselves
             os.remove(tmppath)

@@ -151,6 +151,26 @@ def test_logger_logs_errors(caplog, dietstorage):
     assert record.message.startswith('Missing key(s) in configuration: ')
 
 
+def test_storage_logs_file_access_errors(caplog, dietstorage):
+    dietstorage.temp_dir = '/doesnotexist'
+
+    filename = 'stockholm.jpg'
+    path = join(THIS_DIR, 'test_files', 'stockholm.jpg')
+
+    tmppath = join(dietstorage.temp_dir, filename)
+
+    try:
+        dietstorage.save(path, open(path, 'rb'))
+    except (OSError, IOError):
+        assert not exists(tmppath)
+
+    records = list(caplog.records())
+    assert len(records) == 1
+    record = records[0]
+    assert record.levelname == 'ERROR'
+    assert record.message.startswith('Cannot save to temp dir')
+
+
 def test_save_method_cleans_temp_directory(dietstorage):
     filename = 'stockholm.jpg'
     path = join(THIS_DIR, 'test_files', 'stockholm.jpg')
