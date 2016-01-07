@@ -40,11 +40,12 @@ setup(
     platforms=['OS Independent'],
     license='MIT License',
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',
         'Framework :: Django',
         'Framework :: Django :: 1.7',
         'Framework :: Django :: 1.8',
+        'Framework :: Django :: 1.9',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
@@ -60,7 +61,7 @@ setup(
     ],
     install_requires=[
         'Django>=1.7',
-        'pyimagediet>=1.0.2',
+        'pyimagediet>=1.1.0',
     ],
     include_package_data=True,
     packages=['image_diet'],

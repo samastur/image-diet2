@@ -1,5 +1,6 @@
 import os
 from os.path import abspath, dirname, join
+import pyimagediet.helpers as helpers
 import pytest
 try:
         from StringIO import StringIO
@@ -17,55 +18,6 @@ TEST_DIR = join(abspath(dirname(__file__)), 'test_files')
 #
 # CHECK_DIET_TOOLS TESTS
 #
-def test_find_tools_returns_empty_dict_if_no_tools_are_found():
-    tools = ('fakeoptipng',)
-    cmds = check.Command.find_tools(tools)
-    assert cmds == {}
-
-
-def test_find_tools_finds_them():
-    tools = ('optipng',)
-    cmds = check.Command.find_tools(tools)
-
-    path = os.path.join(TOOLS_DIR, 'optipng')
-    assert cmds['optipng'] == path
-
-
-def test_cmds_to_pipelines_returns_correct_dict_when_tools_present():
-    commands = {
-        'optipng': 'optipng',
-        'pngcrush': 'pngcrush',
-        'gifsicle': 'gifsicle',
-        'jpegoptim': 'jpegoptim',
-    }
-    expected = {
-        'png': ['optipng', 'pngcrush'],
-        'gif': ['gifsicle'],
-        'jpeg': ['jpegoptim']
-    }
-    output = check.Command.cmds_to_pipelines(commands)
-    assert output == expected
-
-
-def test_section_to_yaml_returns_empty_string_when_given_no_commands():
-    output = check.Command.section_to_yaml('commands', {})
-    assert output == ""
-
-
-def test_section_to_yaml_returns_correct_yaml_when_tools_present():
-    tools = {
-        'advpng': '/bin/advpng',
-        'optipng': '/bin/optipng',
-    }
-    expected = """\
-commands:
-  advpng: /bin/advpng
-  optipng: /bin/optipng
-"""
-    output = check.Command.section_to_yaml('commands', tools)
-    assert output == expected
-
-
 def test_check_diet_tools_output():
     expected = """\
 commands:
@@ -76,8 +28,9 @@ pipelines:
 
 """.format(TOOLS_DIR)
 
+    helpers.TOOLS = ('optipng',)
+
     cmd = check.Command()
-    cmd.tools = ('optipng',)
     cmd.stdout = StringIO()
 
     cmd.handle()
