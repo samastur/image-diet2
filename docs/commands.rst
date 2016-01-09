@@ -13,6 +13,10 @@ check_diet_tools
 This command will check system for most common compression tools and print
 paths of those found in format ready for inclusion in YAML configuration file.
 
+You can also use command line utility `diet` that comes with pyimagediet which
+was installed together with image-diet2. You can read about how to use it in
+:ref:`pyimagediet's documentation <pyimagediet:tools>`
+
 
 diet_images
 -----------
